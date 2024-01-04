@@ -1,0 +1,74 @@
+# https://semantic-release.gitbook.io/semantic-release/recipes/ci-configurations/github-actions
+
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: '*' #all branches or [develop] # or main
+
+permissions:
+  contents: read
+
+jobs:
+  # Todo lintjob testjob buildjob releasejob deployjob
+  release:
+    # The following line is used to prevent forks from running this action
+    if: github.repository == 'SoufianeSaadouni/demo-project'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+
+      #strategy:
+      #matrix:
+      #node-version: [21.x, 20.x, 18.x, 16.x]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: lts/*
+
+      - name: Install dependencies
+        # https://docs.npmjs.com/cli/v10/commands/npm-ci
+        run: npm ci # or npm clean-install
+
+        # https://github.blog/changelog/2022-07-26-a-new-npm-audit-signatures-command-to-verify-npm-package-integrity/
+      - name: Verify the integrity of packages
+        run: npm audit signatures
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build project
+        run: npm run build
+
+        # Run semantic-release only when tests succeed or all jobs succeed
+      - name: Run semantic-release
+        run: npx semantic-release
+        env:
+          GIT_AUTHOR_NAME: Soufiane Saadouni
+          GIT_AUTHOR_EMAIL: soufiane_dev@outlook.com
+          GIT_COMMITTER_NAME: Soufiane Saadouni
+          GIT_COMMITTER_EMAIL: soufiane_dev@outlook.com
+          
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Deploy project
+        run: echo 'Deploying project . . .'
