@@ -50,15 +50,6 @@ jobs:
       - name: Verify the integrity of packages
         run: npm audit signatures
 
-      - name: Run Lint
-        run: npm run lint
-
-      - name: Run tests
-        run: npm run test
-
-      - name: Build project
-        run: npm run build
-
         # Run semantic-release only when tests succeed or all jobs succeed
       - name: Run semantic-release
         run: npx semantic-release
