@@ -16,7 +16,7 @@ jobs:
   # Todo lintjob testjob buildjob releasejob deployjob
   release:
     # The following line is used to prevent forks from running this action
-    if: github.repository == 'SoufianeSaadouni/demo-project'
+    if: github.repository == 'ssdev98/sv-project'
     runs-on: ubuntu-latest
 
     permissions:
